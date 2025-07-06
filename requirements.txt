@@ -1,0 +1,6 @@
+langchain_openai
+langchain_google_genai
+transformers
+protobuf
+pandas
+openpyxl
