@@ -1,51 +1,49 @@
-from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
-
 import os
+import google.generativeai as genai
 
-CHAVE_KEY = "keys/openai.key"
-MODELO = "gpt-4o"
+CHAVE_KEY="keys/google_ai_studio.key"
+MODELO="gemini-1.5-flash"
 
-def iniciar_IA(contexto = None):
-    sucesso, IA = False, None
-    
+def iniciar_IA():
+    sucesso, modelo_ia = False, None
     try:
         with open(CHAVE_KEY, "r") as arquivo_chave:
-            chave = arquivo_chave.read()
-            os.environ["OPENAI_API_KEY"] = chave
-
+            chave = arquivo_chave.read().strip()
+            genai.configure(api_key=chave) 
             arquivo_chave.close()
-
-        llm = ChatOpenAI(model=MODELO, temperature=0, max_tokens=None, timeout=None, max_retries=2)
-        IA = ChatPromptTemplate.from_messages(contexto) | llm if contexto is not None else llm
-
-        sucesso = True
+            
+            modelo_ia = genai.GenerativeModel(MODELO)
+            
+            sucesso = True
     except Exception as e:
-        print(f"ocorreu um erro iniciando acesso à IA: {str(e)}")
-    
-    return sucesso, IA
+        print(f"Ocorreu um erro iniciando acesso a IA: {str(e)}")
 
-def obter_resposta(IA, parametros):
+    return sucesso, modelo_ia
+
+def obter_resposta(modelo_ia, prompt_texto):
     sucesso, resposta = False, None
-    
     try:
-        resposta = IA.invoke(parametros)
-        
+        response_obj = modelo_ia.generate_content(prompt_texto)
+        resposta = response_obj.text
         sucesso = True
     except Exception as e:
-        print(f"ocorreu um erro testando o prompt: {str(e)}")
-
+        print(f"Ocorreu um erro testando o prompt: {str(e)}")
+        
     return sucesso, resposta
 
 if __name__ == "__main__":
-    sucesso, IA = iniciar_IA()
-    if sucesso:
-        print("acesso à IA iniciado, iniciando o chat...")
+    sucesso, ia_pronta = iniciar_IA()
 
-        sucesso, resposta = obter_resposta(IA, [
-            (
-                "system", "Responda SIM se você consegue realizar análise de sentimentos sobre trechos de texto. Caso contrário, responda NÃO",
-            )
-        ])
+    if sucesso:
+        print("Acesso à IA iniciado, iniciando o chat de teste...")
+        
+        prompt_de_teste = "Responda SIM se você consegue realizar análise de sentimentos sobre trechos de texto. Caso contrário, responda NÃO."
+        
+        sucesso, resposta = obter_resposta(ia_pronta, prompt_de_teste)
+        
         if sucesso:
-            print(f"Resposta: {resposta.content}") 
+            print(f"Resposta: {resposta}")
+        else:
+            print("Não foi possível obter uma resposta para o teste de prompt.")
+    else:
+        print("Falha ao iniciar acesso à IA. Verifique as mensagens de erro acima.")
