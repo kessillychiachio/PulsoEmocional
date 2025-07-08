@@ -1,0 +1,1 @@
+# pode nao ser usado, pois precisa de uma autenticacao direta do dono do perfil a ser analisado. Ao contrario do youtube, nao pode ser analisado por terceiros.
