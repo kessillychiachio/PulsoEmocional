@@ -1,45 +1,102 @@
-from inicializacao_IA import *
+from inicializacao_IA import iniciar_IA, obter_resposta
 import json
 
-def get_contexto(exemplificar_polaridades = True):
-    contexto = [
-        ("system", "Você é um assistente especializado em avaliar sentimentalmente trechos de texto"),
-        ("system", "Você deve categorizar os textos em três polaridades: NEGATIVA, POSITIVA e NEUTRA"),
-        ("system", "Você também deve determinar qual o tipo de emoção do texto"),
-        ("system", "Limite-se a avaliar a emoção nas seguintes categorias: {emocoes}"),
-        ("system", "A sua classificacao deve ser um estrutura JSON contendo: a polaridade associado ao atributo 'polaridade' e a emoção associada ao atributo 'emocao"),
-        ("system", "A sua classificacao deve ser conter somente o conteúdo do JSON e nada mais"),
-        ("system", "Ou seja, a sua classificacao não pode conter caracteres ou informações que exijam limpeza ou modificação do JSON"),
+def get_prompt_para_classificacao(
+    texto: str,
+    exemplos_positivos: list = None,
+    exemplos_negativos: list = None,
+    exemplos_neutros: list = None,
+    emocoes: list = None
+) -> str:
+    if exemplos_positivos is None:
+        exemplos_positivos = []
+    if exemplos_negativos is None:
+        exemplos_negativos = []
+    if exemplos_neutros is None:
+        exemplos_neutros = []
+    if emocoes is None:
+        emocoes = ['alegria', 'tristeza', 'raiva', 'medo', 'nojo', 'desprezo', 'surpresa']
 
-        ("human", "{texto}")
-    ]
+    prompt_base = f"""
+    Você é um assistente especializado em avaliar sentimentalmente trechos de texto.
+    Você deve categorizar os textos em três polaridades: NEGATIVA, POSITIVA e NEUTRA.
+    Você também deve determinar qual o tipo de emoção do texto.
+    Limite-se a avaliar a emoção nas seguintes categorias: {', '.join(emocoes)}.
+    A sua classificação deve ser uma estrutura JSON contendo: a polaridade associada ao atributo 'polaridade' e a emoção associada ao atributo 'emocao'.
+    A sua classificação deve conter SOMENTE o conteúdo do JSON e NADA mais.
+    Ou seja, a sua classificação não pode conter caracteres ou informações que exijam limpeza ou modificação do JSON.
+    """
 
-    if exemplificar_polaridades:
-        contexto.append(("system", "Textos como {positivos} deve ser categorizado como POSITIVA"))
-        contexto.append(("system", "Textos como {negativos} deve ser categorizado como NEGATIVA"))
-        contexto.append(("system", "Textos como {neutros} deve ser categorizado como NEUTRA"))
+    if exemplos_positivos:
+        prompt_base += f"\nTextos como '{'; '.join(exemplos_positivos)}' devem ser categorizados como POSITIVA."
+    if exemplos_negativos:
+        prompt_base += f"\nTextos como '{'; '.join(exemplos_negativos)}' devem ser categorizados como NEGATIVA."
+    if exemplos_neutros:
+        prompt_base += f"\nTextos como '{'; '.join(exemplos_neutros)}' devem ser categorizados como NEUTRA."
 
-    return contexto
-
-def classificar(IA, texto, exemplos_positivos = [], exemplos_negativos = [], exemplos_neutros = [], emocoes = ['alegria', 'tristeza', 'raiva', 'medo', 'nojo', 'desprezo', 'surpresa']):
-    sucesso, classificacao = obter_resposta(IA, {"positivos": exemplos_positivos, "negativos": exemplos_negativos, "neutros": exemplos_neutros, "emocoes": emocoes, "texto": texto})
+    prompt_final = f"{prompt_base}\n\nTexto para classificar: \"{texto}\"\n\nClassificação:"
     
-    if sucesso:
-        classificacao = classificacao.text()
-        classificacao = classificacao.replace("```json", "")
-        classificacao = classificacao.replace("```", "")
+    return prompt_final
 
-        classificacao = json.loads(classificacao)
+def classificar(
+    modelo_ia,
+    texto: str,
+    exemplos_positivos: list = None,
+    exemplos_negativos: list = None,
+    exemplos_neutros: list = None,
+    emocoes: list = None
+) -> (bool, dict | None):
+    prompt_completo = get_prompt_para_classificacao(
+        texto, exemplos_positivos, exemplos_negativos, exemplos_neutros, emocoes
+    )
+
+    sucesso, resposta_texto_ia = obter_resposta(modelo_ia, prompt_completo)
+    
+    classificacao = None
+    if sucesso:
+        try:
+            resposta_limpa = resposta_texto_ia.replace("```json", "").replace("```", "").strip()
+            classificacao = json.loads(resposta_limpa)
+            sucesso = True
+        except json.JSONDecodeError as e:
+            print(f"ERRO: Resposta da IA não é um JSON válido: {e}")
+            print(f"Resposta bruta da IA: {resposta_texto_ia}")
+            sucesso = False
+        except Exception as e:
+            print(f"ERRO: Ocorreu um erro inesperado no processamento do JSON: {e}")
+            sucesso = False
 
     return sucesso, classificacao
 
 if __name__ == "__main__":
-    sucesso, IA = iniciar_IA(get_contexto())
-    if sucesso:
-        print("acesso à IA iniciado, classificando um texto...")
+    print("Iniciando teste de classificação de sentimentos com Gemini...")
 
-        texto = 'hoje o dia vai ser bom'
-        sucesso, classificacao = classificar(IA, texto, ['você está bonita hoje'], ['hoje é um péssimo dia'], ['hoje é 21 de Outubro'], ['alegria', 'tristeza', 'raiva', 'medo', 'nojo', 'desprezo', 'surpresa'])
+    sucesso_ia, modelo_ia_pronto = iniciar_IA() 
 
-        if sucesso:
-            print(f"classificação do texto '{texto}': {classificacao}")
+    if sucesso_ia:
+        print("Acesso à IA iniciado, classificando um texto...")
+
+        texto_exemplo = 'Hoje o dia vai ser bom! Estou muito animada com as novidades.'
+        exemplos_pos = ['Você está bonita hoje', 'Que alegria te ver!', 'Amei o presente']
+        exemplos_neg = ['Hoje é um péssimo dia', 'Detestei o filme', 'Que tristeza essa notícia']
+        exemplos_neu = ['Hoje é 21 de Outubro', 'A parede é azul', 'O carro estacionou']
+        emocoes_permitidas = ['alegria', 'tristeza', 'raiva', 'medo', 'nojo', 'desprezo', 'surpresa', 'expectativa']
+
+        sucesso_classificacao, resultado_classificacao = classificar(
+            modelo_ia_pronto,
+            texto_exemplo,
+            exemplos_positivos=exemplos_pos,
+            exemplos_negativos=exemplos_neg,
+            exemplos_neutros=exemplos_neu,
+            emocoes=emocoes_permitidas
+        )
+
+        if sucesso_classificacao:
+            print(f"\n--- Classificação do Texto: '{texto_exemplo}' ---")
+            print(f"Polaridade: {resultado_classificacao.get('polaridade', 'Não encontrada')}")
+            print(f"Emoção: {resultado_classificacao.get('emocao', 'Não encontrada')}")
+            print("-------------------------------------------------")
+        else:
+            print("\nNão foi possível classificar o texto. Verifique as mensagens de erro.")
+    else:
+        print("\nFalha ao iniciar acesso à IA. Não foi possível realizar a classificação.")
