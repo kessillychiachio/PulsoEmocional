@@ -72,11 +72,10 @@ def resumir_classificacoes(comentarios):
     print(f"total de polaridades: positivas = {positivas}, negativas = {negativas}, neutras = {neutras}")
 
 if __name__ == "__main__":
-    sucesso, IA = iniciar_IA(get_contexto(False))
+    sucesso, IA = iniciar_IA()
 
     if sucesso:
-        # id_video = "I2WozdKBraM" # https://www.youtube.com/watch?v=I2WozdKBraM
-        id_video = "uYuxLi-FfSw" # https://www.youtube.com/watch?v=uYuxLi-FfSw
+        id_video = "uYuxLi-FfSw"
         sucesso, url = iniciar(id_video)
 
         if sucesso:

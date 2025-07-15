@@ -1,6 +1,4 @@
-google-generativeai
 langchain-google-genai
-transformers
-protobuf
-pandas
-openpyxl
+langchain-core
+python-dotenv
+requests
