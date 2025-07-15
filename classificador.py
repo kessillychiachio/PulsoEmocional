@@ -1,5 +1,6 @@
 from inicializacao_IA import iniciar_IA, obter_resposta
 import json
+from langchain_core.messages import HumanMessage, SystemMessage
 
 def get_prompt_para_classificacao(
     texto: str,
@@ -7,7 +8,7 @@ def get_prompt_para_classificacao(
     exemplos_negativos: list = None,
     exemplos_neutros: list = None,
     emocoes: list = None
-) -> str:
+) -> (SystemMessage, HumanMessage):
     if exemplos_positivos is None:
         exemplos_positivos = []
     if exemplos_negativos is None:
@@ -17,7 +18,7 @@ def get_prompt_para_classificacao(
     if emocoes is None:
         emocoes = ['alegria', 'tristeza', 'raiva', 'medo', 'nojo', 'desprezo', 'surpresa']
 
-    prompt_base = f"""
+    prompt_sistema_conteudo = f"""
     Você é um assistente especializado em avaliar sentimentalmente trechos de texto.
     Você deve categorizar os textos em três polaridades: NEGATIVA, POSITIVA e NEUTRA.
     Você também deve determinar qual o tipo de emoção do texto.
@@ -28,15 +29,16 @@ def get_prompt_para_classificacao(
     """
 
     if exemplos_positivos:
-        prompt_base += f"\nTextos como '{'; '.join(exemplos_positivos)}' devem ser categorizados como POSITIVA."
+        prompt_sistema_conteudo += f"\nTextos como '{'; '.join(exemplos_positivos)}' devem ser categorizados como POSITIVA."
     if exemplos_negativos:
-        prompt_base += f"\nTextos como '{'; '.join(exemplos_negativos)}' devem ser categorizados como NEGATIVA."
+        prompt_sistema_conteudo += f"\nTextos como '{'; '.join(exemplos_negativos)}' devem ser categorizados como NEGATIVA."
     if exemplos_neutros:
-        prompt_base += f"\nTextos como '{'; '.join(exemplos_neutros)}' devem ser categorizados como NEUTRA."
+        prompt_sistema_conteudo += f"\nTextos como '{'; '.join(exemplos_neutros)}' devem ser categorizados como NEUTRA."
 
-    prompt_final = f"{prompt_base}\n\nTexto para classificar: \"{texto}\"\n\nClassificação:"
+    system_message = SystemMessage(content=prompt_sistema_conteudo.strip())
+    human_message = HumanMessage(content=f"Texto para classificar: \"{texto}\"\n\nClassificação:")
     
-    return prompt_final
+    return system_message, human_message
 
 def classificar(
     modelo_ia,
@@ -46,15 +48,16 @@ def classificar(
     exemplos_neutros: list = None,
     emocoes: list = None
 ) -> (bool, dict | None):
-    prompt_completo = get_prompt_para_classificacao(
+    system_message, human_message = get_prompt_para_classificacao(
         texto, exemplos_positivos, exemplos_negativos, exemplos_neutros, emocoes
     )
 
-    sucesso, resposta_texto_ia = obter_resposta(modelo_ia, prompt_completo)
+    sucesso, resposta_obj_ia = obter_resposta(modelo_ia, [system_message, human_message])
     
     classificacao = None
     if sucesso:
         try:
+            resposta_texto_ia = resposta_obj_ia.content
             resposta_limpa = resposta_texto_ia.replace("```json", "").replace("```", "").strip()
             classificacao = json.loads(resposta_limpa)
             sucesso = True
@@ -65,13 +68,15 @@ def classificar(
         except Exception as e:
             print(f"ERRO: Ocorreu um erro inesperado no processamento do JSON: {e}")
             sucesso = False
+    else:
+        print("Falha ao obter resposta da IA para classificação.")
 
     return sucesso, classificacao
 
 if __name__ == "__main__":
     print("Iniciando teste de classificação de sentimentos com Gemini...")
 
-    sucesso_ia, modelo_ia_pronto = iniciar_IA() 
+    sucesso_ia, modelo_ia_pronto = iniciar_IA()
 
     if sucesso_ia:
         print("Acesso à IA iniciado, classificando um texto...")
