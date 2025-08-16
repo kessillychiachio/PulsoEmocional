@@ -1,2 +1,4 @@
 keys/gemini.key
 keys/youtube.key
+__pycache__/
+.DS_Store
