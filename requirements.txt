@@ -2,3 +2,5 @@ langchain_core==0.3.74
 langchain_google_genai==2.1.9
 pandas==2.3.1
 Requests==2.32.4
+scikit-learn==1.5.1
+openpyxl==3.1.5
