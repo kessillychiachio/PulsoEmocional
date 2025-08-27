@@ -3,7 +3,7 @@ import requests
 
 CHAVE_KEY = "keys/youtube.key"
 
-MAXIMO_RESULTADOS = 30
+MAXIMO_RESULTADOS = 100
 URL_COMENTARIOS = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&order=relevance"
 
 def iniciar(id_video, maximo_resultados = MAXIMO_RESULTADOS):
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     sucesso, IA = iniciar_IA()
 
     if sucesso:
-        id_video = "uYuxLi-FfSw"
+        id_video = "UOAoaad5oUk&t=4s"
         sucesso, url = iniciar(id_video)
 
         if sucesso:
