@@ -1,4 +1,4 @@
-# Pulso Emocional: um MicroSaaS para Análise Automática de Sentimentos
+# Pulso Emocional: um MicroSaaS para Análise Automática de Sentimentos baseada em Inteligência Artificial
 
 O Pulso Emocional é uma aplicação web que oferece uma funcionalidade específica e focada: a análise de sentimentos de comentários do YouTube através da IA.
 
@@ -32,3 +32,5 @@ python inicializacao_IA.py
 python inicializacao_banco.py
 python classificador.py
 python classificador_youtube.py
+python validadores_humanos.py
+python coeficiente_kappa.py
