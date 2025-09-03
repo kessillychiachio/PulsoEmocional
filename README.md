@@ -31,6 +31,10 @@ pip install -r requirements.txt
 python inicializacao_IA.py
 python inicializacao_banco.py
 python classificador.py
+<<<<<<< HEAD
 python classificador_youtube.py --video-id <videoid> // passa o video id no shell para determinar o video que sera analisado
+=======
+python classificador_youtube.py --video-id <videoid> // passa o video id no shell para determinar o video que sera analisado, sem as <>
+>>>>>>> c621861 (add)
 python validadores_humanos.py
 python coeficiente_kappa.py
