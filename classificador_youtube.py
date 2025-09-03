@@ -7,11 +7,7 @@ from pathlib import Path
 import argparse
 
 CHAVE_KEY = "keys/youtube.key"
-<<<<<<< HEAD
-MAXIMO_RESULTADOS = 100
-=======
 MAXIMO_RESULTADOS = 60
->>>>>>> c621861 (add)
 URL_COMENTARIOS = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&order=relevance"
 
 def iniciar(id_video, maximo_resultados = MAXIMO_RESULTADOS):
@@ -64,11 +60,7 @@ def classificar_comentarios(comentarios):
             comentario.update({"polaridade": "erro", "emocao": "erro"})
     return comentarios
 
-<<<<<<< HEAD
-def gerar_planilha(video_id: str, n: int = 100, saida: str = "resultados_da_ia.xlsx"):
-=======
 def gerar_planilha(video_id: str, n: int = 61, saida: str = "resultados_da_ia.xlsx"):
->>>>>>> c621861 (add)
     sucesso_url, url = iniciar(video_id, maximo_resultados=n)
     if not sucesso_url:
         print("não foi possível montar a URL de coleta")
@@ -109,14 +101,7 @@ def gerar_planilha(video_id: str, n: int = 61, saida: str = "resultados_da_ia.xl
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Coleta, classifica e gera planilha (Texto, Polaridade) de comentários do YouTube.")
     parser.add_argument("--video-id", required=True)
-<<<<<<< HEAD
-    parser.add_argument("--n", type=int, default=100)
-    parser.add_argument("--saida", default="resultados_da_ia.xlsx")
-    args = parser.parse_args()
-    gerar_planilha(args.video_id, max(1, min(100, args.n)), args.saida)
-=======
     parser.add_argument("--n", type=int, default=61)
     parser.add_argument("--saida", default="resultados_da_ia.xlsx")
     args = parser.parse_args()
     gerar_planilha(args.video_id, max(1, min(61, args.n)), args.saida)
->>>>>>> c621861 (add)
