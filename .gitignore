@@ -1,5 +1,5 @@
-keys/gemini.key
-keys/youtube.key
+/backend/keys/gemini.key
+/backend/keys/youtube.key
 __pycache__/
 .DS_Store
 venv
