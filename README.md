@@ -14,7 +14,7 @@ pip (gerenciador de pacotes do Python)
 git clone https://github.com/kessillychiachio/PulsoEmocional.git
 cd PulsoEmocional
 
-2) Crie e Ative o Ambiente Virtual:
+2) Crie o Ambiente Virtual:
 
 python3.13 -m venv venv
 
@@ -28,13 +28,16 @@ pip install -r requirements.txt
 
 ## Como Rodar o Projeto
 
+cd backend
+
 python inicializacao_IA.py
+
 python inicializacao_banco.py
+
 python classificador.py
-<<<<<<< HEAD
-python classificador_youtube.py --video-id <videoid> // passa o video id no shell para determinar o video que sera analisado
-=======
-python classificador_youtube.py --video-id <videoid> // passa o video id no shell para determinar o video que sera analisado, sem as <>
->>>>>>> c621861 (add)
+
+python classificador_youtube.py --video-id <videoid> // passa o video id no shell para determinar o video que sera analisado, sem as <> // O video que foi usado para fazer a avaliacao foi o: https://www.youtube.com/watch?v=D2KIu_yDeJk
+
 python validadores_humanos.py
+
 python coeficiente_kappa.py

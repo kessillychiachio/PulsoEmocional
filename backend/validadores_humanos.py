@@ -30,24 +30,24 @@ def preparar_planilhas_para_avaliacao():
     df_para_avaliadores.reset_index(drop=True, inplace=True)
 
     df_danilo = df_para_avaliadores.copy()
-    df_danilo['Avaliação Humana (Danilo)'] = ''
+    df_danilo['Avaliação Humana (danilo)'] = ''
     nome_arquivo_danilo = 'avaliacoes_danilo.xlsx'
     try:
         df_danilo.to_excel(nome_arquivo_danilo, index=False, engine='openpyxl')
     except ImportError:
         nome_arquivo_danilo = 'avaliacoes_danilo.csv'
         df_danilo.to_csv(nome_arquivo_danilo, index=False, encoding='utf-8')
-    print(f"Planilha '{nome_arquivo_danilo}' criada com sucesso para Danilo!")
+    print(f"Planilha '{nome_arquivo_danilo}' criada com sucesso para danilo!")
 
-    df_melkes = df_para_avaliadores.copy()
-    df_melkes['Avaliação Humana (Melkes)'] = ''
-    nome_arquivo_melkes = 'avaliacoes_melkes.xlsx'
+    df_melques = df_para_avaliadores.copy()
+    df_melques['Avaliação Humana (melques)'] = ''
+    nome_arquivo_melques = 'avaliacoes_melques.xlsx'
     try:
-        df_melkes.to_excel(nome_arquivo_melkes, index=False, engine='openpyxl')
+        df_melques.to_excel(nome_arquivo_melques, index=False, engine='openpyxl')
     except ImportError:
-        nome_arquivo_melkes = 'avaliacoes_melkes.csv'
-        df_melkes.to_csv(nome_arquivo_melkes, index=False, encoding='utf-8')
-    print(f"Planilha '{nome_arquivo_melkes}' criada com sucesso para Melkes!")
+        nome_arquivo_melques = 'avaliacoes_melques.csv'
+        df_melques.to_csv(nome_arquivo_melques, index=False, encoding='utf-8')
+    print(f"Planilha '{nome_arquivo_melques}' criada com sucesso para melques!")
 
     print("\nInstruções: Envie as planilhas para cada avaliador. Após o preenchimento, use o script 'coeficiente_kappa.py'.")
 

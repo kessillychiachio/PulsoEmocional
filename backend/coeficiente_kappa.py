@@ -35,9 +35,9 @@ def interpretar_kappa(kappa_score: float) -> str:
 def consolidar_e_calcular_kappa():
     base = _load_table("resultados_da_ia.xlsx", "resultados_da_ia.csv")
     danilo = _load_table("avaliacoes_danilo.xlsx", "avaliacoes_danilo.csv")
-    melkes = _load_table("avaliacoes_melkes.xlsx", "avaliacoes_melkes.csv")
+    melques = _load_table("avaliacoes_melques.xlsx", "avaliacoes_melques.csv")
 
-    if base is None or danilo is None or melkes is None:
+    if base is None or danilo is None or melques is None:
         print("ERRO: Arquivos necessários não encontrados. Gere as planilhas e preencha as avaliações.")
         return
 
@@ -55,45 +55,45 @@ def consolidar_e_calcular_kappa():
             print("ERRO: A planilha base precisa conter a coluna 'Polaridade' ou 'Sentimento da IA'.")
             return
 
-    if "Texto" not in danilo.columns or ("Avaliação Humana (Danilo)" not in danilo.columns and "Avaliacao_Danilo" not in danilo.columns):
-        print("ERRO: A planilha do Danilo deve conter as colunas 'Texto' e 'Avaliação Humana (Danilo)'.")
+    if "Texto" not in danilo.columns or ("Avaliação Humana (danilo)" not in danilo.columns and "Avaliacao_danilo" not in danilo.columns):
+        print("ERRO: A planilha do danilo deve conter as colunas 'Texto' e 'Avaliação Humana (danilo)'.")
         return
-    if "Texto" not in melkes.columns or ("Avaliação Humana (Melkes)" not in melkes.columns and "Avaliacao_Melkes" not in melkes.columns):
-        print("ERRO: A planilha do Melkes deve conter as colunas 'Texto' e 'Avaliação Humana (Melkes)'.")
+    if "Texto" not in melques.columns or ("Avaliação Humana (melques)" not in melques.columns and "Avaliacao_melques" not in melques.columns):
+        print("ERRO: A planilha do melques deve conter as colunas 'Texto' e 'Avaliação Humana (melques)'.")
         return
 
-    if "Avaliação Humana (Danilo)" in danilo.columns:
-        danilo = danilo.rename(columns={"Avaliação Humana (Danilo)": "Avaliacao_Danilo"})
-    if "Avaliação Humana (Melkes)" in melkes.columns:
-        melkes = melkes.rename(columns={"Avaliação Humana (Melkes)": "Avaliacao_Melkes"})
+    if "Avaliação Humana (danilo)" in danilo.columns:
+        danilo = danilo.rename(columns={"Avaliação Humana (danilo)": "Avaliacao_danilo"})
+    if "Avaliação Humana (melques)" in melques.columns:
+        melques = melques.rename(columns={"Avaliação Humana (melques)": "Avaliacao_melques"})
 
     base["Texto"] = base["Texto"].astype(str)
     danilo["Texto"] = danilo["Texto"].astype(str)
-    melkes["Texto"] = melkes["Texto"].astype(str)
+    melques["Texto"] = melques["Texto"].astype(str)
 
-    df = base.merge(danilo[["Texto", "Avaliacao_Danilo"]], on="Texto", how="left")
-    df = df.merge(melkes[["Texto", "Avaliacao_Melkes"]], on="Texto", how="left")
+    df = base.merge(danilo[["Texto", "Avaliacao_danilo"]], on="Texto", how="left")
+    df = df.merge(melques[["Texto", "Avaliacao_melques"]], on="Texto", how="left")
 
     df["Polaridade"] = _normalize_label(df["Polaridade"])
-    df["Avaliacao_Danilo"] = _normalize_label(df["Avaliacao_Danilo"]) if "Avaliacao_Danilo" in df.columns else ""
-    df["Avaliacao_Melkes"] = _normalize_label(df["Avaliacao_Melkes"]) if "Avaliacao_Melkes" in df.columns else ""
+    df["Avaliacao_danilo"] = _normalize_label(df["Avaliacao_danilo"]) if "Avaliacao_danilo" in df.columns else ""
+    df["Avaliacao_melques"] = _normalize_label(df["Avaliacao_melques"]) if "Avaliacao_melques" in df.columns else ""
 
     print("Amostra consolidada:")
     print(df.head())
     print("-" * 50)
 
-    df_k = df[(df["Avaliacao_Danilo"] != "") & (df["Avaliacao_Melkes"] != "")]
+    df_k = df[(df["Avaliacao_danilo"] != "") & (df["Avaliacao_melques"] != "")]
     if df_k.empty:
         print("ERRO: Nenhuma avaliação humana preenchida nas duas planilhas.")
         return
 
-    kappa_ia_danilo = cohen_kappa_score(df_k["Polaridade"], df_k["Avaliacao_Danilo"])
-    kappa_ia_melkes = cohen_kappa_score(df_k["Polaridade"], df_k["Avaliacao_Melkes"])
-    kappa_danilo_melkes = cohen_kappa_score(df_k["Avaliacao_Danilo"], df_k["Avaliacao_Melkes"])
+    kappa_ia_danilo = cohen_kappa_score(df_k["Polaridade"], df_k["Avaliacao_danilo"])
+    kappa_ia_melques = cohen_kappa_score(df_k["Polaridade"], df_k["Avaliacao_melques"])
+    kappa_danilo_melques = cohen_kappa_score(df_k["Avaliacao_danilo"], df_k["Avaliacao_melques"])
 
-    print(f"Coeficiente de Kappa (IA vs. Danilo): {kappa_ia_danilo:.4f} -> {interpretar_kappa(kappa_ia_danilo)}")
-    print(f"Coeficiente de Kappa (IA vs. Melkes): {kappa_ia_melkes:.4f} -> {interpretar_kappa(kappa_ia_melkes)}")
-    print(f"Coeficiente de Kappa (Danilo vs. Melkes): {kappa_danilo_melkes:.4f} -> {interpretar_kappa(kappa_danilo_melkes)}")
+    print(f"Coeficiente de Kappa (IA vs. danilo): {kappa_ia_danilo:.4f} -> {interpretar_kappa(kappa_ia_danilo)}")
+    print(f"Coeficiente de Kappa (IA vs. melques): {kappa_ia_melques:.4f} -> {interpretar_kappa(kappa_ia_melques)}")
+    print(f"Coeficiente de Kappa (danilo vs. melques): {kappa_danilo_melques:.4f} -> {interpretar_kappa(kappa_danilo_melques)}")
 
     try:
         df.to_excel("resultados_consolidados_finais.xlsx", index=False, engine="openpyxl")

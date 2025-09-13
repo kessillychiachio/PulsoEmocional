@@ -1,4 +1,4 @@
-from backend.classificador import *
+from classificador import *
 import requests
 import pandas as pd
 from openpyxl import load_workbook

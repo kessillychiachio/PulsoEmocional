@@ -1,4 +1,4 @@
-from backend.inicializacao_IA import iniciar_IA, obter_resposta
+from inicializacao_IA import iniciar_IA, obter_resposta
 import json
 from langchain_core.messages import HumanMessage, SystemMessage
 
@@ -20,7 +20,7 @@ def get_prompt_para_classificacao(
 
     prompt_sistema_conteudo = f"""
     Você é um assistente especializado em avaliar sentimentalmente trechos de texto.
-    Você deve categorizar os textos em três polaridades: NEGATIVA, POSITIVA e NEUTRA.
+    Você deve categorizar os textos em três polaridades: NEGATIVO, POSITIVO e NEUTRO.
     Você também deve determinar qual o tipo de emoção do texto.
     Limite-se a avaliar a emoção nas seguintes categorias: {', '.join(emocoes)}.
     A sua classificação deve ser uma estrutura JSON contendo: a polaridade associada ao atributo 'polaridade' e a emoção associada ao atributo 'emocao'.
@@ -29,11 +29,11 @@ def get_prompt_para_classificacao(
     """
 
     if exemplos_positivos:
-        prompt_sistema_conteudo += f"\nTextos como '{'; '.join(exemplos_positivos)}' devem ser categorizados como POSITIVA."
+        prompt_sistema_conteudo += f"\nTextos como '{'; '.join(exemplos_positivos)}' devem ser categorizados como POSITIVO."
     if exemplos_negativos:
-        prompt_sistema_conteudo += f"\nTextos como '{'; '.join(exemplos_negativos)}' devem ser categorizados como NEGATIVA."
+        prompt_sistema_conteudo += f"\nTextos como '{'; '.join(exemplos_negativos)}' devem ser categorizados como NEGATIVO."
     if exemplos_neutros:
-        prompt_sistema_conteudo += f"\nTextos como '{'; '.join(exemplos_neutros)}' devem ser categorizados como NEUTRA."
+        prompt_sistema_conteudo += f"\nTextos como '{'; '.join(exemplos_neutros)}' devem ser categorizados como NEUTRO."
 
     system_message = SystemMessage(content=prompt_sistema_conteudo.strip())
     human_message = HumanMessage(content=f"Texto para classificar: \"{texto}\"\n\nClassificação:")
