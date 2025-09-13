@@ -12,6 +12,7 @@ pip (gerenciador de pacotes do Python)
 
 1) Clone o Repositório:
 git clone https://github.com/kessillychiachio/PulsoEmocional.git
+
 cd PulsoEmocional
 
 2) Crie o Ambiente Virtual:
@@ -36,7 +37,7 @@ python inicializacao_banco.py
 
 python classificador.py
 
-python classificador_youtube.py --video-id <videoid> // passa o video id no shell para determinar o video que sera analisado, sem as <> // O video que foi usado para fazer a avaliacao foi o: https://www.youtube.com/watch?v=D2KIu_yDeJk
+python classificador_youtube.py --video-id <videoid> // passa o video id no shell para determinar o video que sera analisado, sem as <> // O video que foi usado para fazer a avaliacao do projeto foi o: https://www.youtube.com/watch?v=D2KIu_yDeJk
 
 python validadores_humanos.py
 
