@@ -1,6 +1,6 @@
 /backend/keys/gemini.key
 /backend/keys/youtube.key
-__pycache__/
+/backend/__pycache__/
 .DS_Store
 venv
 *.xlsx
