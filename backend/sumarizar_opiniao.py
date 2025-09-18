@@ -3,7 +3,6 @@ from inicializacao_IA import iniciar_IA, obter_resposta
 from langchain_core.messages import HumanMessage, SystemMessage
 
 def preparar_dados_para_sumarizacao(df: pd.DataFrame) -> (int, int, int):
-    """Conta a polaridade do DataFrame."""
     contagem_polaridade = df['Polaridade'].value_counts().to_dict()
     positivos = contagem_polaridade.get('POSITIVO', 0)
     negativos = contagem_polaridade.get('NEGATIVO', 0)
@@ -17,12 +16,11 @@ def criar_prompt_sumarizacao(
     neutros: int,
     comentarios_amostra: str
 ) -> (SystemMessage, HumanMessage):
-    """Cria o prompt para a IA resumir as opiniões de forma narrativa e contextualizada."""
     prompt_sistema_conteudo = f"""
     Você é um assistente especializado em analisar e resumir grandes volumes de feedback de usuários, como os comentários de um vídeo do YouTube.
     Sua tarefa é criar um resumo, em português, que pareça um comentário escrito por um membro da equipe de marketing da empresa do criador do vídeo, ponderando preocupaçōes, que seja baseado nos dados de análise de sentimento que eu fornecer.
     O resumo deve focar em identificar o assunto principal abordado nos comentários e relacionar o sentimento geral do vídeo a esse assunto.
-    Apresente o resumo de forma fluida e em um único parágrafo, sem adicionar informações extras ou suposições.
+    Apresente o resumo de forma fluida e em um único parágrafo, sem adicionar informações extras ou suposições, sem adicionar gírias.
     """
 
     prompt_humano_conteudo = f"""
@@ -43,7 +41,6 @@ def criar_prompt_sumarizacao(
     return system_message, human_message
 
 def gerar_sumario(df: pd.DataFrame) -> str | None:
-    """Gera o resumo final das opiniões usando a IA."""
     sucesso_ia, modelo_ia = iniciar_IA()
 
     if not sucesso_ia:
@@ -51,10 +48,7 @@ def gerar_sumario(df: pd.DataFrame) -> str | None:
         return None
 
     positivos, negativos, neutros = preparar_dados_para_sumarizacao(df)
-
-    # Pegue uma amostra dos comentários para que a IA possa analisar o tópico
-    # Usamos os 50 primeiros comentários para economizar tokens
-    comentarios_amostra = " ".join(df['Texto'].head(50).tolist())
+    comentarios_amostra = " ".join(df['Texto'].head(60).tolist())
 
     system_message, human_message = criar_prompt_sumarizacao(
         positivos, negativos, neutros, comentarios_amostra
@@ -80,11 +74,14 @@ def main():
         print("A planilha de resultados está vazia. Não há nada para resumir.")
         return
 
+    positivos, negativos, neutros = preparar_dados_para_sumarizacao(df)
     resumo = gerar_sumario(df)
+    
     if resumo:
-        print("\n--- Resumo da Análise de Sentimentos ---")
+        print("\nResumo da Análise de Sentimentos")
         print(resumo)
-        print("---------------------------------------")
+        print ("\nForam analisados:")
+        print(f"{positivos} comentários positivos, {negativos} negativos e {neutros} neutros.\n")
 
 if __name__ == "__main__":
     main()
