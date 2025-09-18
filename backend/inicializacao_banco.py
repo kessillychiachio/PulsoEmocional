@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
             for contador, row in planilha.iterrows():
                 texto = row['text_pt'].strip().lower().replace("'", "")
-                polaridade = 'NEGATIVA' if row['sentiment'] == "neg" else "POSITIVA"
+                polaridade = 'NEGATIVO' if row['sentiment'] == "neg" else "POSITIVO"
 
                 gravar_classificacao(texto, polaridade, "")
 
