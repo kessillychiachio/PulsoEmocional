@@ -7,7 +7,6 @@ def get_prompt_para_classificacao(
     exemplos_positivos: list = None,
     exemplos_negativos: list = None,
     exemplos_neutros: list = None,
-    emocoes: list = None
 ) -> (SystemMessage, HumanMessage):
     if exemplos_positivos is None:
         exemplos_positivos = []
@@ -15,15 +14,11 @@ def get_prompt_para_classificacao(
         exemplos_negativos = []
     if exemplos_neutros is None:
         exemplos_neutros = []
-    if emocoes is None:
-        emocoes = ['alegria', 'tristeza', 'raiva', 'medo', 'nojo', 'desprezo', 'surpresa']
 
     prompt_sistema_conteudo = f"""
     Você é um assistente especializado em avaliar sentimentalmente trechos de texto.
     Você deve categorizar os textos em três polaridades: NEGATIVO, POSITIVO e NEUTRO.
-    Você também deve determinar qual o tipo de emoção do texto.
-    Limite-se a avaliar a emoção nas seguintes categorias: {', '.join(emocoes)}.
-    A sua classificação deve ser uma estrutura JSON contendo: a polaridade associada ao atributo 'polaridade' e a emoção associada ao atributo 'emocao'.
+    A sua classificação deve ser uma estrutura JSON contendo: a polaridade associada ao atributo 'polaridade'.
     A sua classificação deve conter SOMENTE o conteúdo do JSON e NADA mais.
     Ou seja, a sua classificação não pode conter caracteres ou informações que exijam limpeza ou modificação do JSON.
     """
@@ -46,10 +41,9 @@ def classificar(
     exemplos_positivos: list = None,
     exemplos_negativos: list = None,
     exemplos_neutros: list = None,
-    emocoes: list = None
 ) -> (bool, dict | None):
     system_message, human_message = get_prompt_para_classificacao(
-        texto, exemplos_positivos, exemplos_negativos, exemplos_neutros, emocoes
+        texto, exemplos_positivos, exemplos_negativos, exemplos_neutros
     )
 
     sucesso, resposta_obj_ia = obter_resposta(modelo_ia, [system_message, human_message])
@@ -85,7 +79,6 @@ if __name__ == "__main__":
         exemplos_pos = ['Você está bonita hoje', 'Que alegria te ver!', 'Amei o presente']
         exemplos_neg = ['Hoje é um péssimo dia', 'Detestei o filme', 'Que tristeza essa notícia']
         exemplos_neu = ['Hoje é 21 de Outubro', 'A parede é azul', 'O carro estacionou']
-        emocoes_permitidas = ['alegria', 'tristeza', 'raiva', 'medo', 'nojo', 'desprezo', 'surpresa', 'expectativa']
 
         sucesso_classificacao, resultado_classificacao = classificar(
             modelo_ia_pronto,
@@ -93,13 +86,11 @@ if __name__ == "__main__":
             exemplos_positivos=exemplos_pos,
             exemplos_negativos=exemplos_neg,
             exemplos_neutros=exemplos_neu,
-            emocoes=emocoes_permitidas
         )
 
         if sucesso_classificacao:
             print(f"\n--- Classificação do Texto: '{texto_exemplo}' ---")
             print(f"Polaridade: {resultado_classificacao.get('polaridade', 'Não encontrada')}")
-            print(f"Emoção: {resultado_classificacao.get('emocao', 'Não encontrada')}")
             print("-------------------------------------------------")
         else:
             print("\nNão foi possível classificar o texto. Verifique as mensagens de erro.")
