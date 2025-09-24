@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, Float, func
-from db import Base
+from backend.database.db import Base
 
 class Analise(Base):
     __tablename__ = "analises"
