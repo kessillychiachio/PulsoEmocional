@@ -1,7 +1,7 @@
 /backend/keys/gemini.key
 /backend/keys/youtube.key
-/backend/__pycache__/
-.DS_Store
+*__pycache__
+*.DS_Store
 venv
 *.xlsx
 /frontend/.env
