@@ -1,6 +1,7 @@
-from inicializacao_IA import iniciar_IA, obter_resposta
+from backend.utils.inicializacao_IA import iniciar_IA, obter_resposta
 import json
 from langchain_core.messages import HumanMessage, SystemMessage
+from typing import Union, List, Optional
 
 def get_prompt_para_classificacao(
     texto: str,
@@ -41,7 +42,7 @@ def classificar(
     exemplos_positivos: list = None,
     exemplos_negativos: list = None,
     exemplos_neutros: list = None,
-) -> (bool, dict | None):
+) -> (bool, Union[dict, None]):
     system_message, human_message = get_prompt_para_classificacao(
         texto, exemplos_positivos, exemplos_negativos, exemplos_neutros
     )

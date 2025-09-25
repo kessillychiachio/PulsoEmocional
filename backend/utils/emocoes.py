@@ -1,4 +1,4 @@
-from inicializacao_IA import iniciar_IA, obter_resposta
+from utils.inicializacao_IA import iniciar_IA, obter_resposta
 from langchain_core.messages import HumanMessage, SystemMessage
 import pandas as pd
 from pathlib import Path
@@ -13,7 +13,9 @@ EMOCOES_PADRAO = ["alegria","tristeza","raiva","medo","nojo","desprezo","surpres
 def carregar_comentarios(caminho: str) -> list:
     df = pd.read_excel(caminho) if caminho.lower().endswith(".xlsx") else pd.read_csv(caminho)
     df = df.fillna("")
-    textos = [str(t).strip() for t in df.get("Texto", []).tolist()]
+    if "Texto" not in df.columns:
+        return []
+    textos = [str(t).strip() for t in df["Texto"].tolist()]
     textos = [t for t in textos if t]
     return textos
 
@@ -21,7 +23,7 @@ def montar_prompt_emocao(texto: str, emocoes: list) -> (SystemMessage, HumanMess
     conteudo = f"""
 Você é um assistente que classifica a emoção predominante de um texto curto.
 Escolha exatamente uma emoção dentre: {', '.join(emocoes)}.
-Retorne apenas JSON no formato: {{"emocao": "<uma_emocao_da_lista"}}.
+Retorne apenas JSON no formato: {{"emocao": "<uma_emocao_da_lista>"}}.
 Não retorne explicações, apenas o JSON válido.
     """.strip()
     return SystemMessage(content=conteudo), HumanMessage(content=f'Texto: "{texto}"\nClassificação:')
@@ -91,3 +93,8 @@ if __name__ == "__main__":
     parser.add_argument("--categorias", nargs="*", default=EMOCOES_PADRAO)
     args = parser.parse_args()
     executar(args.entrada, args.saida_planilha, args.saida_imagem, args.categorias)
+    
+
+def analisar_emocoes(textos: list, ia, categorias: list | None = None) -> list:
+    cats = categorias if categorias else EMOCOES_PADRAO
+    return gerar_emocoes(textos, ia, cats)

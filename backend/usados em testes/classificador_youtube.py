@@ -1,9 +1,9 @@
-from classificador import classificar
-from inicializacao_IA import iniciar_IA
+from backend.utils.classificador import classificar
+from backend.utils.inicializacao_IA import iniciar_IA
 import requests
 import pandas as pd
 from pathlib import Path
-import argparse
+import argparsex
 
 CHAVE_KEY = "keys/youtube.key"
 LIMITE_COMENTARIOS = 60

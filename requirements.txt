@@ -1,6 +1,12 @@
-langchain_core==0.3.74
-langchain_google_genai==2.1.9
+fastapi
+uvicorn[standard]
+langchain-google-genai==2.1.9
+langchain-core==0.3.74
 pandas==2.3.1
-Requests==2.32.4
+requests==2.32.4
 scikit-learn==1.5.1
 openpyxl==3.1.5
+sqlalchemy==2.0.2
+matplotlib
+wordcloud
+python-dotenv
