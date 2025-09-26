@@ -33,6 +33,7 @@ import {
   ThumbsDown,
 } from "lucide-react";
 import { SentimentChart } from "./SentimentChart";
+import { AnalysisHistory } from "./AnalysisHistory";
 import { toast } from "sonner";
 
 const extractVideoId = (urlOrId: string): string | null => {

@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-
+from backend.models.video_models import Video
 from backend.utils.inicializacao_IA import iniciar_IA
 from backend.utils.youtube_api import construir_url_comentarios, buscar_comentarios
 from backend.utils.classificador import classificar as classificar_polaridade
@@ -87,3 +87,12 @@ def deletar_video_por_id(db: Session, video_id_youtube: str):
     
     sucesso = crud.deletar_video_por_id(db, video.id)
     return sucesso
+
+def listar_videos(db: Session, limit: int, offset: int):
+    return (
+        db.query(Video)
+        .order_by(Video.criado_em.desc())
+        .limit(limit)
+        .offset(offset)
+        .all()
+    )

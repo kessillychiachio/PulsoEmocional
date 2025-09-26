@@ -45,3 +45,17 @@ export async function deletarAnalise(videoId: string): Promise<{ message: string
   }
   return resp.json();
 }
+
+export type VideoAnaliseResumo = {
+  video_id_youtube: string;
+  resumo: string;
+  criado_em: string;
+  total_comentarios?: number;
+  polaridade_geral?: "POSITIVO" | "NEGATIVO" | "NEUTRO" | "DESCONHECIDO";
+};
+
+export async function listarVideosAnalisados(limit = 20, offset = 0): Promise<VideoAnaliseResumo[]> {
+  const res = await fetch(`/api/analises/videos?limit=${limit}&offset=${offset}`);
+  if (!res.ok) throw new Error("Falha ao listar vídeos analisados");
+  return res.json();
+}
