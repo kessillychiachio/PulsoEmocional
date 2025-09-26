@@ -1,8 +1,8 @@
 import argparse
-from utils.inicializacao_IA import iniciar_IA, obter_resposta
+from backend.utils.inicializacao_IA import iniciar_IA, obter_resposta
 from langchain_core.messages import HumanMessage, SystemMessage
-from database.db import SessionLocal
-from services.crud import obter_video_por_id_youtube, obter_comentarios_de_video, salvar_resumo
+from backend.database.db import SessionLocal
+from backend.services.crud import obter_video_por_id_youtube, obter_comentarios_de_video, salvar_resumo
 
 def criar_prompt(textos: list[str]) -> tuple[SystemMessage, HumanMessage]:
     s = (
