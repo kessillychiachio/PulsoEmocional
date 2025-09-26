@@ -1,37 +1,11 @@
 import React, { useState } from "react";
 import { iniciarAnalise, deletarAnalise, VideoAnalise, Comentario } from "../services/api";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Badge } from "./ui/badge";
-import { Progress } from "./ui/progress";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "./ui/tabs";
-import {
-  Brain,
-  Smile,
-  Frown,
-  Meh,
-  BarChart3,
-  Youtube,
-  Link,
-  RefreshCw,
-  Shield,
-  FileText,
-  ThumbsUp,
-  ThumbsDown,
-} from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Smile, Frown, Meh, BarChart3, Youtube, Link as LinkIcon, RefreshCw, FileText, ThumbsUp, ThumbsDown, Clock } from "lucide-react";
 import { SentimentChart } from "./SentimentChart";
 import { AnalysisHistory } from "./AnalysisHistory";
 import { toast } from "sonner";
@@ -95,28 +69,6 @@ export function Dashboard() {
     }
   };
 
-  const getSentimentColor = (sentiment: string) => {
-    switch (sentiment) {
-      case "POSITIVO":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "NEGATIVO":
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    }
-  };
-
-  const getSentimentLabel = (sentiment: string) => {
-    switch (sentiment) {
-      case "POSITIVO":
-        return "Positivo";
-      case "NEGATIVO":
-        return "Negativo";
-      default:
-        return "Neutro";
-    }
-  };
-
   const stats = analise ? {
     totalAnalyses: analise.comentarios.length,
     positiveCount: analise.comentarios.filter(c => c.polaridade === "POSITIVO").length,
@@ -129,23 +81,11 @@ export function Dashboard() {
     neutralCount: 0,
   };
 
-  const mapCommentsToSentimentResults = (comments: Comentario[]) => {
-    return comments.map((c, idx) => ({
-      id: `${analise?.video_id_youtube}-${idx}`,
-      text: c.texto,
-      sentiment: c.polaridade === 'POSITIVO' ? 'positive' : c.polaridade === 'NEGATIVO' ? 'negative' : 'neutral',
-      confidence: 0.9,
-      emotions: { joy: 0, sadness: 0, anger: 0, fear: 0, surprise: 0 },
-      timestamp: new Date(analise?.criado_em || ""),
-      source: "youtube" as const,
-    }));
-  }
-
   const generateSummaryText = () => {
     if (!analise || !analise.resumo) return "Nenhum resumo gerado pela IA.";
     return analise.resumo;
   };
-  
+
   return (
     <div className="min-h-screen p-6" role="main">
       <div className="max-w-7xl mx-auto">
@@ -164,7 +104,6 @@ export function Dashboard() {
               <div className="text-2xl font-bold" aria-label={`${stats.totalAnalyses} análises totais`}>{stats.totalAnalyses}</div>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Positivos</CardTitle>
@@ -174,7 +113,6 @@ export function Dashboard() {
               <div className="text-2xl font-bold text-green-600" aria-label={`${stats.positiveCount} comentários positivos`}>{stats.positiveCount}</div>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Negativos</CardTitle>
@@ -184,7 +122,6 @@ export function Dashboard() {
               <div className="text-2xl font-bold text-red-600" aria-label={`${stats.negativeCount} comentários negativos`}>{stats.negativeCount}</div>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Neutros</CardTitle>
@@ -197,14 +134,18 @@ export function Dashboard() {
         </div>
 
         <Tabs defaultValue="sentiment" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2" role="tablist">
+          <TabsList className="grid w-full grid-cols-3" role="tablist">
             <TabsTrigger value="sentiment" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" aria-hidden="true" />
-              Análise de Sentimento
+              Análise
             </TabsTrigger>
             <TabsTrigger value="summary" className="flex items-center gap-2">
               <FileText className="h-4 w-4" aria-hidden="true" />
               Resumo
+            </TabsTrigger>
+            <TabsTrigger value="history" className="flex items-center gap-2">
+              <Clock className="h-4 w-4" aria-hidden="true" />
+              Histórico de vídeos
             </TabsTrigger>
           </TabsList>
 
@@ -238,15 +179,15 @@ export function Dashboard() {
                           className="bg-red-600 hover:bg-red-700 focus:ring-2 focus:ring-red-500"
                           aria-label="Conectar ao vídeo do YouTube"
                         >
-                          {isAnalyzing ? <RefreshCw className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Link className="h-4 w-4" aria-hidden="true" />}
+                          {isAnalyzing ? <RefreshCw className="h-4 w-4 animate-spin" aria-hidden="true" /> : <LinkIcon className="h-4 w-4" aria-hidden="true" />}
                         </Button>
                       </div>
                       {analise && (
                         <div className="flex justify-end mt-2">
-                          <Button 
-                            variant="destructive" 
-                            size="sm" 
-                            onClick={deleteAnalysis} 
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={deleteAnalysis}
                             disabled={isAnalyzing}
                             aria-label="Deletar análise atual"
                           >
@@ -307,6 +248,10 @@ export function Dashboard() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="history" className="space-y-6" role="tabpanel">
+            <AnalysisHistory />
           </TabsContent>
         </Tabs>
       </div>

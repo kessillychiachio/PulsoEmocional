@@ -54,8 +54,21 @@ export type VideoAnaliseResumo = {
   polaridade_geral?: "POSITIVO" | "NEGATIVO" | "NEUTRO" | "DESCONHECIDO";
 };
 
-export async function listarVideosAnalisados(limit = 20, offset = 0): Promise<VideoAnaliseResumo[]> {
-  const res = await fetch(`/api/analises/videos?limit=${limit}&offset=${offset}`);
-  if (!res.ok) throw new Error("Falha ao listar vídeos analisados");
+export type VideoOut = {
+  id: number;
+  video_id_youtube: string;
+  resumo: string | null;
+  criado_em: string;
+};
+
+export async function listarVideosAnalisados(limit = 20, offset = 0): Promise<VideoOut[]> {
+  const res = await fetch(`${BASE_URL}/videos?limit=${limit}&offset=${offset}`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({} as any));
+    throw new Error(err.detail || "Falha ao listar vídeos analisados");
+  }
   return res.json();
 }
+
+
+
