@@ -1,17 +1,22 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
+from dotenv import load_dotenv
 
 import os
 
-CHAVE_KEY = "keys/gemini.key"
+load_dotenv()
 MODELO = "gemini-2.0-flash"
 
 def iniciar_IA(contexto = None):
     sucesso, IA = False, None
     
     try:
-        with open(CHAVE_KEY, "r") as arquivo_chave:
+        chave_path = os.getenv("CHAVE_KEY_PATH")
+        if not chave_path:
+            raise ValueError("A variável de ambiente 'CHAVE_KEY_PATH' não está definida.")
+            
+        with open(chave_path, "r") as arquivo_chave:
             chave = arquivo_chave.read().strip()
             os.environ["GOOGLE_API_KEY"] = chave
 

@@ -10,7 +10,7 @@ class Video(Base):
     resumo = Column(Text, nullable=True)
     criado_em = Column(DateTime, server_default=func.now(), nullable=False)
 
-    comentarios = relationship("Comentario", back_populates="video")
+    comentarios = relationship("Comentario", back_populates="video", cascade="all, delete-orphan")
 
 class Comentario(Base):
     __tablename__ = "comentarios"

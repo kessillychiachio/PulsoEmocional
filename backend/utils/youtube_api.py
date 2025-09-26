@@ -8,7 +8,7 @@ from backend.utils.inicializacao_IA import iniciar_IA, obter_resposta
 from backend.utils.classificador import classificar
 from backend.utils.emocoes import analisar_emocoes, EMOCOES_PADRAO
 
-CHAVE_KEY = "keys/youtube.key"
+CHAVE_KEY = "backend/keys/youtube.key"
 LIMITE_COMENTARIOS = 60
 URL_BASE = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&order=relevance"
 

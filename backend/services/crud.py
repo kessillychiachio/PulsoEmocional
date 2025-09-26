@@ -41,3 +41,11 @@ def obter_video_por_id_youtube(db: Session, video_id_youtube: str):
 def obter_comentarios_de_video(db: Session, video_id:int) -> list[str]:
     comentarios = db.query(Comentario.texto).filter(Comentario.video_id == video_id).all()
     return [c[0] for c in comentarios]
+
+def deletar_video_por_id(db: Session, video_id: int):
+    video = db.query(Video).filter(Video.id == video_id).first()
+    if video:
+        db.delete(video)
+        db.commit()
+        return True
+    return False

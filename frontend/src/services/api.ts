@@ -1,40 +1,47 @@
-export type Comentario = { Texto: string };
-export type Classificado = { Texto: string; Polaridade: "POSITIVO" | "NEGATIVO" | "NEUTRO" | "OUTRO" | "DESCONHECIDO" | "erro" };
-export type YoutubeResp = { comentarios: Comentario[]; classificados: Classificado[] };
-
-export type AnaliseItem = {
-  id: number;
-  Texto: string;
-  Polaridade: "POSITIVO" | "NEGATIVO" | "NEUTRO" | "OUTRO" | "DESCONHECIDO" | "erro";
-  Origem: "manual" | "youtube";
-  Confianca: number | null;
-  CriadoEm: string;
-};
-
 const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
-export async function processarYoutube(videoId: string, n = 60): Promise<YoutubeResp> {
-  const resp = await fetch(`${BASE_URL}/api/youtube/processar`, {
+export interface Comentario {
+  texto: string;
+  polaridade: "POSITIVO" | "NEGATIVO" | "NEUTRO" | "DESCONHECIDO" | "erro";
+  emocao: string;
+}
+
+export interface VideoAnalise {
+  id: number;
+  video_id_youtube: string;
+  resumo: string | null;
+  criado_em: string;
+  comentarios: Comentario[];
+}
+
+export async function iniciarAnalise(videoId: string, n_comentarios = 60): Promise<VideoAnalise> {
+  const resp = await fetch(`${BASE_URL}/videos/analisar?video_id=${videoId}&n_comentarios=${n_comentarios}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ video_id: videoId, n })
   });
-  if (!resp.ok) throw new Error(await resp.text());
+  if (!resp.ok) {
+    const errorData = await resp.json();
+    throw new Error(errorData.detail || "Erro ao iniciar a análise.");
+  }
   return resp.json();
 }
 
-export async function classificarTexto(texto: string): Promise<Classificado> {
-  const resp = await fetch(`${BASE_URL}/api/classificar/texto`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ texto })
-  });
-  if (!resp.ok) throw new Error(await resp.text());
+export async function obterAnalise(videoId: string): Promise<VideoAnalise> {
+  const resp = await fetch(`${BASE_URL}/videos/${videoId}`);
+  if (!resp.ok) {
+    const errorData = await resp.json();
+    throw new Error(errorData.detail || "Erro ao obter análise.");
+  }
   return resp.json();
 }
 
-export async function listarAnalises(limit = 20, offset = 0): Promise<AnaliseItem[]> {
-  const resp = await fetch(`${BASE_URL}/api/analises?limit=${limit}&offset=${offset}`);
-  if (!resp.ok) throw new Error(await resp.text());
+export async function deletarAnalise(videoId: string): Promise<{ message: string }> {
+  const resp = await fetch(`${BASE_URL}/videos/${videoId}`, {
+    method: "DELETE",
+  });
+  if (!resp.ok) {
+    const errorData = await resp.json();
+    throw new Error(errorData.detail || "Erro ao deletar análise.");
+  }
   return resp.json();
 }

@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from backend.database.db import SessionLocal
 from backend.services.video_service import (
-    iniciar_analise_completa,
-    obter_video_analisado
+    analisar_video_sincrono,
+    obter_video_analisado,
+    deletar_video_por_id
 )
-
+from backend.services import crud
 router = APIRouter(prefix="/videos", tags=["Vídeos"])
 
 def get_db():
@@ -16,17 +17,28 @@ def get_db():
         db.close()
 
 @router.post("/analisar")
-async def iniciar_analise_video(
+def iniciar_analise_video(
     video_id: str,
-    background_tasks: BackgroundTasks,
     n_comentarios: int = 60,
     db: Session = Depends(get_db)
 ):
-    return iniciar_analise_completa(db, video_id, n_comentarios, background_tasks)
+    return analisar_video_sincrono(db, video_id, n_comentarios)
 
 @router.get("/{video_id_youtube}")
-async def obter_analise_video(
+def obter_analise_video(
     video_id_youtube: str,
     db: Session = Depends(get_db)
 ):
     return obter_video_analisado(db, video_id_youtube)
+
+@router.delete("/{video_id_youtube}")
+def deletar_analise_video(
+    video_id_youtube: str,
+    db: Session = Depends(get_db)
+):
+    sucesso = deletar_video_por_id(db, video_id_youtube)
+    if not sucesso:
+        raise HTTPException(status_code=404, detail="Vídeo não encontrado.")
+    
+    return {"message": f"Vídeo '{video_id_youtube}' e seus comentários foram deletados com sucesso."}
+

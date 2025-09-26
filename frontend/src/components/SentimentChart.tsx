@@ -1,32 +1,21 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { TrendingUp, Youtube, MessageSquare } from 'lucide-react';
 
-interface SentimentResult {
-  id: string;
-  text: string;
-  sentiment: 'positive' | 'negative' | 'neutral';
-  confidence: number;
-  emotions: {
-    joy: number;
-    sadness: number;
-    anger: number;
-    fear: number;
-    surprise: number;
-  };
-  timestamp: Date;
-  source: 'manual' | 'youtube';
-  author?: string;
+interface Comentario {
+  texto: string;
+  polaridade: 'POSITIVO' | 'NEGATIVO' | 'NEUTRO' | 'DESCONHECIDO' | 'erro';
+  emocao: string;
 }
 
 interface SentimentChartProps {
-  results: SentimentResult[];
+  comments: Comentario[];
 }
 
-export function SentimentChart({ results }: SentimentChartProps) {
-  if (results.length === 0) {
+export function SentimentChart({ comments }: SentimentChartProps) {
+  if (!comments || comments.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -48,82 +37,41 @@ export function SentimentChart({ results }: SentimentChartProps) {
   const sentimentData = [
     {
       name: 'Positivo',
-      value: results.filter(r => r.sentiment === 'positive').length,
+      value: comments.filter(c => c.polaridade === 'POSITIVO').length,
       color: '#10B981',
-      percentage: ((results.filter(r => r.sentiment === 'positive').length / results.length) * 100).toFixed(1)
     },
     {
       name: 'Negativo',
-      value: results.filter(r => r.sentiment === 'negative').length,
+      value: comments.filter(c => c.polaridade === 'NEGATIVO').length,
       color: '#EF4444',
-      percentage: ((results.filter(r => r.sentiment === 'negative').length / results.length) * 100).toFixed(1)
     },
     {
       name: 'Neutro',
-      value: results.filter(r => r.sentiment === 'neutral').length,
+      value: comments.filter(c => c.polaridade === 'NEUTRO' || c.polaridade === 'DESCONHECIDO').length,
       color: '#F59E0B',
-      percentage: ((results.filter(r => r.sentiment === 'neutral').length / results.length) * 100).toFixed(1)
     }
   ];
 
-  const emotionData = results.length > 0 ? [
-    {
-      name: 'Alegria',
-      value: results.reduce((acc, r) => acc + r.emotions.joy, 0) / results.length,
-      color: '#FBBF24'
-    },
-    {
-      name: 'Tristeza',
-      value: results.reduce((acc, r) => acc + r.emotions.sadness, 0) / results.length,
-      color: '#3B82F6'
-    },
-    {
-      name: 'Raiva',
-      value: results.reduce((acc, r) => acc + r.emotions.anger, 0) / results.length,
-      color: '#EF4444'
-    },
-    {
-      name: 'Medo',
-      value: results.reduce((acc, r) => acc + r.emotions.fear, 0) / results.length,
-      color: '#8B5CF6'
-    },
-    {
-      name: 'Surpresa',
-      value: results.reduce((acc, r) => acc + r.emotions.surprise, 0) / results.length,
-      color: '#10B981'
-    }
-  ] : [];
-
-  // Time series data for trend analysis
-  const timeSeriesData = results
-    .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
-    .map((result, index) => ({
-      index: index + 1,
-      sentiment: result.sentiment === 'positive' ? 1 : result.sentiment === 'negative' ? -1 : 0,
-      confidence: result.confidence * 100
-    }));
-
-  const sourceData = [
-    {
-      name: 'YouTube',
-      value: results.filter(r => r.source === 'youtube').length,
-      color: '#FF0000'
-    },
-    {
-      name: 'Manual',
-      value: results.filter(r => r.source === 'manual').length,
-      color: '#8B5CF6'
-    }
-  ];
+  const validEmotions = comments.filter(c => c.emocao && c.emocao !== 'indefinida');
+  const emotionCounts: { [key: string]: number } = validEmotions.reduce((acc, c) => {
+    acc[c.emocao] = (acc[c.emocao] || 0) + 1;
+    return acc;
+  }, {} as { [key: string]: number });
+  
+  const emotionData = Object.keys(emotionCounts).map(emocao => ({
+    name: emocao.charAt(0).toUpperCase() + emocao.slice(1),
+    value: emotionCounts[emocao],
+  }));
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
+      const total = payload.reduce((sum: number, entry: any) => sum + entry.value, 0);
+      const percentage = total > 0 ? ((payload[0].value / total) * 100).toFixed(1) : 0;
+
       return (
         <div className="bg-white p-3 border rounded-lg shadow-lg" role="tooltip">
-          <p className="font-medium">{`${payload[0].name}: ${payload[0].value}`}</p>
-          {payload[0].payload.percentage && (
-            <p className="text-sm text-gray-600">{`${payload[0].payload.percentage}% do total`}</p>
-          )}
+          <p className="font-medium" style={{ color: payload[0].color }}>{`${payload[0].name}: ${payload[0].value}`}</p>
+          <p className="text-sm text-gray-600">{`${percentage}% do total`}</p>
         </div>
       );
     }
@@ -140,9 +88,9 @@ export function SentimentChart({ results }: SentimentChartProps) {
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="text-xs">
             <MessageSquare className="h-3 w-3 mr-1" aria-hidden="true" />
-            {results.length} análises
+            {comments.length} comentários
           </Badge>
-          {results.some(r => r.source === 'youtube') && (
+          {comments.length > 0 && (
             <Badge variant="outline" className="text-xs bg-red-50 text-red-700 border-red-200">
               <Youtube className="h-3 w-3 mr-1" aria-hidden="true" />
               YouTube
@@ -157,12 +105,18 @@ export function SentimentChart({ results }: SentimentChartProps) {
             <h4 className="font-medium mb-3">Distribuição de Sentimentos</h4>
             <div className="grid grid-cols-3 gap-2 mb-4 text-sm">
               {sentimentData.map((item, index) => (
-                <div key={index} className="text-center p-2 rounded" style={{ backgroundColor: item.color + '20' }} role="group" aria-label={`${item.name}: ${item.value} comentários, ${item.percentage}%`}>
+                <div 
+                  key={index} 
+                  className="text-center p-2 rounded" 
+                  style={{ backgroundColor: item.color + '20' }} 
+                  role="group" 
+                  aria-label={`${item.name}: ${item.value} comentários`}
+                >
                   <div className="font-medium" style={{ color: item.color }}>
                     {item.value}
                   </div>
                   <div className="text-xs text-gray-600">{item.name}</div>
-                  <div className="text-xs font-medium">{item.percentage}%</div>
+                  <div className="text-xs font-medium">{((item.value / comments.length) * 100).toFixed(1)}%</div>
                 </div>
               ))}
             </div>
@@ -190,45 +144,18 @@ export function SentimentChart({ results }: SentimentChartProps) {
           </div>
 
           {/* Emotion Distribution */}
-          <div>
-            <h4 className="font-medium mb-3">Emoções Médias</h4>
-            <div role="img" aria-label="Gráfico de emoções médias detectadas">
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={emotionData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" fontSize={12} />
-                  <YAxis fontSize={12} />
-                  <Tooltip formatter={(value) => [`${Number(value).toFixed(1)}%`, 'Intensidade']} />
-                  <Bar dataKey="value" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Sentiment Trend */}
-          {timeSeriesData.length > 5 && (
+          {emotionData.length > 0 && (
             <div>
-              <h4 className="font-medium mb-3">Tendência de Sentimentos</h4>
-              <div role="img" aria-label="Gráfico de linha mostrando tendência de sentimentos ao longo do tempo">
-                <ResponsiveContainer width="100%" height={150}>
-                  <LineChart data={timeSeriesData}>
+              <h4 className="font-medium mb-3">Contagem de Emoções</h4>
+              <div role="img" aria-label="Gráfico de barras mostrando a contagem de emoções detectadas">
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={emotionData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="index" fontSize={12} />
-                    <YAxis domain={[-1, 1]} fontSize={12} />
-                    <Tooltip 
-                      formatter={(value: number) => [
-                        value === 1 ? 'Positivo' : value === -1 ? 'Negativo' : 'Neutro', 
-                        'Sentimento'
-                      ]} 
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="sentiment" 
-                      stroke="#8884d8" 
-                      strokeWidth={2}
-                      dot={{ r: 3 }}
-                    />
-                  </LineChart>
+                    <XAxis dataKey="name" fontSize={12} />
+                    <YAxis fontSize={12} />
+                    <Tooltip />
+                    <Bar dataKey="value" fill="#8B5CF6" />
+                  </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
