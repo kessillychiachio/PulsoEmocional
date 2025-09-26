@@ -11,4 +11,4 @@ app = FastAPI(
     version="1.0.0",
 )
 
-app.include_router(videos_routes.router)
+app.include_router(video_routes.router)
