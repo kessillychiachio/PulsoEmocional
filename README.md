@@ -47,5 +47,6 @@ python coeficiente_kappa.py
 
 ## Como Rodar o Projeto - back e front
 Com a venv ativa
-Em um terminal, va ate a pasta backend e rode uvicorn main:app --reload
+Em um terminal, rode uvicorn main:app --reload na raiz do projeto
+
 Em outro terminal, va ate a pasta frontend e rode npm run dev 
