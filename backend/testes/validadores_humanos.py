@@ -29,25 +29,25 @@ def preparar_planilhas_para_avaliacao():
     df_para_avaliadores.drop_duplicates(inplace=True)
     df_para_avaliadores.reset_index(drop=True, inplace=True)
 
-    df_danilo = df_para_avaliadores.copy()
-    df_danilo['Avaliação Humana (danilo)'] = ''
-    nome_arquivo_danilo = 'avaliacoes_danilo.xlsx'
+    df_avaliador1 = df_para_avaliadores.copy()
+    df_avaliador1 ['Avaliação Humana (avaliador1)'] = ''
+    nome_arquivo_avaliador1 = 'avaliacoes_1.xlsx'
     try:
-        df_danilo.to_excel(nome_arquivo_danilo, index=False, engine='openpyxl')
+        df_avaliador1.to_excel(nome_arquivo_avaliador1, index=False, engine='openpyxl')
     except ImportError:
-        nome_arquivo_danilo = 'avaliacoes_danilo.csv'
-        df_danilo.to_csv(nome_arquivo_danilo, index=False, encoding='utf-8')
-    print(f"Planilha '{nome_arquivo_danilo}' criada com sucesso para danilo!")
+        nome_arquivo_avaliador1 = 'avaliacoes_1.csv'
+        df_avaliador1.to_csv(nome_arquivo_avaliador1, index=False, encoding='utf-8')
+    print(f"Planilha '{nome_arquivo_avaliador1}' criada com sucesso para avaliador1!")
 
-    df_melques = df_para_avaliadores.copy()
-    df_melques['Avaliação Humana (melques)'] = ''
-    nome_arquivo_melques = 'avaliacoes_melques.xlsx'
+    df_avaliador2 = df_para_avaliadores.copy()
+    df_avaliador2['Avaliação Humana (avaliador2)'] = ''
+    nome_arquivo_avaliador2 = 'avaliacoes_2.xlsx'
     try:
-        df_melques.to_excel(nome_arquivo_melques, index=False, engine='openpyxl')
+        df_avaliador2.to_excel(nome_arquivo_avaliador2, index=False, engine='openpyxl')
     except ImportError:
-        nome_arquivo_melques = 'avaliacoes_melques.csv'
-        df_melques.to_csv(nome_arquivo_melques, index=False, encoding='utf-8')
-    print(f"Planilha '{nome_arquivo_melques}' criada com sucesso para melques!")
+        nome_arquivo_avaliador2 = 'avaliacoes_2.csv'
+        df_avaliador2.to_csv(nome_arquivo_avaliador2, index=False, encoding='utf-8')
+    print(f"Planilha '{nome_arquivo_avaliador2}' criada com sucesso para avaliador2!")
 
     print("\nInstruções: Envie as planilhas para cada avaliador. Após o preenchimento, use o script 'coeficiente_kappa.py'.")
 
