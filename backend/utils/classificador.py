@@ -1,4 +1,4 @@
-from backend.utils.inicializacao_IA import iniciar_IA, obter_resposta
+from inicializacao_IA import iniciar_IA, obter_resposta
 import json
 from langchain_core.messages import HumanMessage, SystemMessage
 from typing import Union, List, Optional
