@@ -5,8 +5,7 @@ from backend.models.video_models import Video, Comentario
 def criar_video(db: Session, video_id_youtube: str) -> Video:
     video = Video(video_id_youtube=video_id_youtube)
     db.add(video)
-    db.commit()
-    db.refresh(video)
+    db.flush()
     return video
 
 def salvar_comentario(db: Session, video_id: int, texto: str, polaridade: str, emocao: str) -> Comentario:
@@ -17,16 +16,12 @@ def salvar_comentario(db: Session, video_id: int, texto: str, polaridade: str, e
         video_id=video_id
     )
     db.add(comentario)
-    db.commit()
-    db.refresh(comentario)
     return comentario
 
 def salvar_resumo(db: Session, video_id: int, resumo: str) -> Video:
     video = db.query(Video).filter(Video.id == video_id).first()
     if video:
         video.resumo = resumo
-        db.commit()
-        db.refresh(video)
     return video
 
 def listar_comentarios(db: Session, video_id: int) -> List[Comentario]:
