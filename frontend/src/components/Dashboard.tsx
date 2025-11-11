@@ -86,6 +86,33 @@ export function Dashboard() {
     return analise.resumo;
   };
 
+  const SummaryContent = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <FileText className="h-5 w-5 text-blue-600" aria-hidden="true" />
+          Resumo dos Comentários
+        </CardTitle>
+        <CardDescription>Análise consolidada de todos os comentários processados</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {!analise ? (
+          <div className="text-center py-8">
+            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500">Nenhum comentário analisado ainda</p>
+            <p className="text-sm text-gray-400 mt-2">Comece analisando alguns comentários para ver o resumo aqui</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="prose max-w-none">
+              <p className="whitespace-pre-wrap text-gray-700">{generateSummaryText()}</p>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="min-h-screen p-6" role="main">
       <div className="max-w-7xl mx-auto">
@@ -94,54 +121,11 @@ export function Dashboard() {
           <p className="text-gray-600">Monitore sentimentos em comentários do YouTube em tempo real</p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de comentários</CardTitle>
-              <BarChart3 className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" aria-label={`${stats.totalAnalyses} análises totais`}>{stats.totalAnalyses}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Positivos</CardTitle>
-              <ThumbsUp className="h-4 w-4 text-green-500" aria-hidden="true" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600" aria-label={`${stats.positiveCount} comentários positivos`}>{stats.positiveCount}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Negativos</CardTitle>
-              <ThumbsDown className="h-4 w-4 text-red-500" aria-hidden="true" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600" aria-label={`${stats.negativeCount} comentários negativos`}>{stats.negativeCount}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Neutros</CardTitle>
-              <Meh className="h-4 w-4 text-gray-500" aria-hidden="true" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-600" aria-label={`${stats.neutralCount} comentários neutros`}>{stats.neutralCount}</div>
-            </CardContent>
-          </Card>
-        </div>
-
         <Tabs defaultValue="sentiment" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3" role="tablist">
+          <TabsList className="grid w-1/3 grid-cols-2" role="tablist"> 
             <TabsTrigger value="sentiment" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" aria-hidden="true" />
               Análise
-            </TabsTrigger>
-            <TabsTrigger value="summary" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" aria-hidden="true" />
-              Resumo
             </TabsTrigger>
             <TabsTrigger value="history" className="flex items-center gap-2">
               <Clock className="h-4 w-4" aria-hidden="true" />
@@ -182,22 +166,11 @@ export function Dashboard() {
                           {isAnalyzing ? <RefreshCw className="h-4 w-4 animate-spin" aria-hidden="true" /> : <LinkIcon className="h-4 w-4" aria-hidden="true" />}
                         </Button>
                       </div>
-                      {analise && (
-                        <div className="flex justify-end mt-2">
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={deleteAnalysis}
-                            disabled={isAnalyzing}
-                            aria-label="Deletar análise atual"
-                          >
-                            Deletar Análise
-                          </Button>
-                        </div>
-                      )}
                     </div>
                   </CardContent>
                 </Card>
+
+                <SummaryContent />
               </div>
 
               <div className="space-y-6">
@@ -205,53 +178,15 @@ export function Dashboard() {
               </div>
             </div>
           </TabsContent>
-
-          <TabsContent value="summary" className="space-y-6" role="tabpanel">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-blue-600" aria-hidden="true" />
-                  Resumo dos Comentários
-                </CardTitle>
-                <CardDescription>Análise consolidada de todos os comentários processados</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {!analise ? (
-                  <div className="text-center py-8">
-                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500">Nenhum comentário analisado ainda</p>
-                    <p className="text-sm text-gray-400 mt-2">Comece analisando alguns comentários para ver o resumo aqui</p>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    <div className="prose max-w-none">
-                      <p className="whitespace-pre-wrap text-gray-700">{generateSummaryText()}</p>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t">
-                      <div className="text-center p-4 bg-green-50 rounded-lg">
-                        <div className="text-2xl font-bold text-green-600 mb-1">{stats.positiveCount}</div>
-                        <div className="text-sm text-green-700">Comentários Positivos</div>
-                        <div className="text-xs text-green-600 mt-1">{((stats.positiveCount / stats.totalAnalyses) * 100).toFixed(1)}% do total</div>
-                      </div>
-                      <div className="text-center p-4 bg-red-50 rounded-lg">
-                        <div className="text-2xl font-bold text-red-600 mb-1">{stats.negativeCount}</div>
-                        <div className="text-sm text-red-700">Comentários Negativos</div>
-                        <div className="text-xs text-red-600 mt-1">{((stats.negativeCount / stats.totalAnalyses) * 100).toFixed(1)}% do total</div>
-                      </div>
-                      <div className="text-center p-4 bg-gray-50 rounded-lg">
-                        <div className="text-2xl font-bold text-gray-600 mb-1">{stats.neutralCount}</div>
-                        <div className="text-sm text-gray-700">Comentários Neutros</div>
-                        <div className="text-xs text-gray-600 mt-1">{((stats.neutralCount / stats.totalAnalyses) * 100).toFixed(1)}% do total</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
           <TabsContent value="history" className="space-y-6" role="tabpanel">
-            <AnalysisHistory />
+            <AnalysisHistory 
+        currentActiveVideoId={analise?.video_id_youtube} 
+        onDeleteSuccess={(deletedVideoId) => { 
+            if (analise?.video_id_youtube === deletedVideoId) {
+                setAnalise(null);
+            }
+        }}
+            />
           </TabsContent>
         </Tabs>
       </div>
