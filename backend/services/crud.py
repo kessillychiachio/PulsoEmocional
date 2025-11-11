@@ -2,8 +2,8 @@ from typing import List
 from sqlalchemy.orm import Session
 from backend.models.video_models import Video, Comentario
 
-def criar_video(db: Session, video_id_youtube: str) -> Video:
-    video = Video(video_id_youtube=video_id_youtube)
+def criar_video(db: Session, video_id_youtube: str, titulo: str | None = None) -> Video:
+    video = Video(video_id_youtube=video_id_youtube, titulo=titulo)
     db.add(video)
     db.flush()
     return video
@@ -28,7 +28,7 @@ def listar_comentarios(db: Session, video_id: int) -> List[Comentario]:
     return db.query(Comentario).filter(Comentario.video_id == video_id).all()
 
 def listar_videos(db: Session, limit: int = 10, offset: int = 0) -> List[Video]:
-    return db.query(Video).order_by(Video.id.desc()).offset(offset).limit(limit).all()
+    return db.query(Video).order_by(Video.id.desc()).limit(limit).offset(offset).all()
 
 def obter_video_por_id_youtube(db: Session, video_id_youtube: str):
     return db.query(Video).filter(Video.video_id_youtube == video_id_youtube).first()

@@ -1,12 +1,13 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from backend.utils.inicializacao_IA import iniciar_IA
-from backend.utils.youtube_api import construir_url_comentarios, buscar_comentarios
+from backend.utils.youtube_api import construir_url_comentarios, buscar_comentarios, obter_titulo_youtube 
 from backend.utils.classificador import classificar as classificar_polaridade
 from backend.utils.emocoes import analisar_emocoes
 from backend.utils.sumarizacao import gerar_resumo
 from backend.services import crud
 from backend.models.video_models import Video
+import asyncio
 
 
 def analisar_video_sincrono(db: Session, video_id_youtube: str, n_comentarios: int):
@@ -19,7 +20,9 @@ def analisar_video_sincrono(db: Session, video_id_youtube: str, n_comentarios: i
         raise HTTPException(status_code=500, detail="Falha ao iniciar a IA.")
 
     try:
-        novo_video_db = crud.criar_video(db, video_id_youtube)
+        titulo = obter_titulo_youtube(video_id_youtube)
+        
+        novo_video_db = crud.criar_video(db, video_id_youtube, titulo=titulo)
 
         sucesso_url, url_comentarios = construir_url_comentarios(video_id_youtube, n_comentarios)
         if not sucesso_url:
@@ -70,6 +73,7 @@ def obter_video_analisado(db: Session, video_id_youtube: str):
     return {
         "id": video_db.id,
         "video_id_youtube": video_db.video_id_youtube,
+        "titulo": video_db.titulo,
         "resumo": video_db.resumo,
         "criado_em": video_db.criado_em,
         "comentarios": [
