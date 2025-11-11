@@ -93,9 +93,11 @@ export function AnalysisHistory({ currentActiveVideoId, onDeleteSuccess }: Analy
                       {fmtTime(it.criado_em)}
                     </time>
                   </header>
-
-                  <h3 className="text-sm font-semibold truncate" title={it.video_id_youtube}>
-                    {it.video_id_youtube}
+                  <h3 className="text-sm font-semibold truncate" title={it.titulo ?? it.video_id_youtube}>
+                    {it.titulo ?? it.video_id_youtube}
+                    {it.titulo && (
+                        <span className="text-xs text-gray-500 ml-2">({it.video_id_youtube})</span>
+                    )}
                   </h3>
 
                   <p className="text-sm text-gray-700 line-clamp-3">
