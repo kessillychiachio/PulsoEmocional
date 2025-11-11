@@ -7,12 +7,17 @@ from backend.services.crud import obter_video_por_id_youtube, criar_video, salva
 from backend.utils.inicializacao_IA import iniciar_IA, obter_resposta
 from backend.utils.classificador import classificar
 from backend.utils.emocoes import analisar_emocoes, EMOCOES_PADRAO
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY") 
 CHAVE_KEY = "backend/keys/youtube.key"
 LIMITE_COMENTARIOS = 60
 URL_BASE = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&order=relevance"
+YOUTUBE_VIDEOS_URL = "https://www.googleapis.com/youtube/v3/videos"
 
-def construir_url_comentarios(video_id: str, n: int) -> (bool, str | None):
+def construir_url_comentarios(video_id: str, n: int) -> tuple[bool, str | None]:
     try:
         with open(CHAVE_KEY, "r") as f:
             chave = f.read().strip()
@@ -26,7 +31,7 @@ def construir_url_comentarios(video_id: str, n: int) -> (bool, str | None):
         print(f"ERRO: Ocorreu um erro ao montar a URL: {str(e)}")
         return False, None
 
-def buscar_comentarios(url: str) -> (bool, list):
+def buscar_comentarios(url: str) -> tuple[bool, list]:
     try:
         resp = requests.get(url, timeout=20)
         if not resp.ok:
@@ -46,6 +51,38 @@ def buscar_comentarios(url: str) -> (bool, list):
         print(f"ERRO: Ocorreu um erro ao buscar os comentários: {str(e)}")
         return False, []
 
+def buscar_titulo(video_id: str) -> str | None:
+    chave = YOUTUBE_API_KEY
+    if not chave:
+        print("AVISO: Chave YOUTUBE_API_KEY não configurada no ambiente.")
+        return None
+
+    try:
+        params = {
+            "id": video_id,
+            "key": chave,
+            "part": "snippet",
+            "fields": "items(snippet(title))",
+        }
+        resp = requests.get(YOUTUBE_VIDEOS_URL, params=params, timeout=10)
+        
+        if not resp.ok:
+            print(f"ERRO: Falha HTTP ao buscar título: {resp.status_code}")
+            return None
+            
+        dados = resp.json()
+        items = dados.get("items", [])
+        
+        if items:
+            return items[0]["snippet"]["title"]
+            
+        return None
+        
+    except Exception as e:
+        print(f"ERRO: Ocorreu um erro ao buscar o título: {str(e)}")
+        return None
+
+
 def analisar_e_salvar_comentarios_do_video(video_id: str, n: int) -> None:
     db = SessionLocal()
     sucesso_ia, modelo_ia = iniciar_IA()
@@ -61,16 +98,24 @@ def analisar_e_salvar_comentarios_do_video(video_id: str, n: int) -> None:
             print(f"O vídeo {video_id} já existe no banco. Nenhum novo comentário será salvo.")
             return
 
-        novo_video_db = criar_video(db, video_id)
+        titulo_video = buscar_titulo(video_id)
+        if titulo_video:
+            print(f"Título do vídeo encontrado: {titulo_video}")
+        else:
+            print(f"Aviso: Não foi possível obter o título para o vídeo {video_id}.")
+
+        novo_video_db = criar_video(db, video_id, titulo=titulo_video)
         print(f"Vídeo {video_id} criado no banco com ID interno {novo_video_db.id}.")
 
         sucesso_url, url_comentarios = construir_url_comentarios(video_id, n)
         if not sucesso_url:
+            db.rollback()
             return
 
         sucesso_comentarios, comentarios = buscar_comentarios(url_comentarios)
         if not sucesso_comentarios or not comentarios:
             print("Nenhum comentário válido para processar. Encerrando.")
+            db.rollback()
             return
 
         comentarios_analisados = []
@@ -97,6 +142,10 @@ def analisar_e_salvar_comentarios_do_video(video_id: str, n: int) -> None:
         
         print(f"Análise e salvamento de {len(comentarios)} comentários concluídos com sucesso!")
 
+    except Exception as e:
+        print(f"ERRO FATAL: Falha na transação. Fazendo rollback: {e}")
+        db.rollback()
+        
     finally:
         db.close()
 
