@@ -7,6 +7,7 @@ class Video(Base):
     __tablename__ = "videos"
     id = Column(Integer, primary_key=True, index=True)
     video_id_youtube = Column(String, unique=True, index=True)
+    titulo = Column(String, nullable=True)
     resumo = Column(Text, nullable=True)
     criado_em = Column(DateTime, server_default=func.now(), nullable=False)
 
