@@ -6,21 +6,27 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-MODELO = "gemini-2.0-flash"
+MODELO = "gemini-2.5-flash"
 
 def iniciar_IA(contexto = None):
     sucesso, IA = False, None
     
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    
+    if not api_key:
+        print("ocorreu um erro iniciando acesso à IA: Chave 'GEMINI_API_KEY' não encontrada no ambiente.")
+        return False, None
+        
     try:
-        chave_path = os.getenv("CHAVE_KEY_PATH")
-        if not chave_path:
-            raise ValueError("A variável de ambiente 'CHAVE_KEY_PATH' não está definida.")
-            
-        with open(chave_path, "r") as arquivo_chave:
-            chave = arquivo_chave.read().strip()
-            os.environ["GOOGLE_API_KEY"] = chave
+        os.environ["GOOGLE_API_KEY"] = api_key
 
-        llm = ChatGoogleGenerativeAI(model=MODELO, temperature=0, max_output_tokens=None, timeout=None, max_retries=2)
+        llm = ChatGoogleGenerativeAI(
+            model=MODELO, 
+            temperature=0, 
+            max_output_tokens=None, 
+            timeout=None, 
+            max_retries=2
+        )
         
         if contexto is not None:
             IA = ChatPromptTemplate.from_messages(contexto) | llm
@@ -28,10 +34,9 @@ def iniciar_IA(contexto = None):
             IA = llm
 
         sucesso = True
-    except FileNotFoundError:
-        print(f"ocorreu um erro iniciando acesso à IA: o arquivo de chave '{CHAVE_KEY}' não foi encontrado.")
     except Exception as e:
-        print(f"ocorreu um erro iniciando acesso à IA: {str(e)}")
+        # 4. Captura qualquer erro de inicialização ou módulo
+        print(f"ocorreu um erro iniciando acesso à IA: Falha ao carregar o modelo Langchain. Detalhe: {str(e)}")
     
     return sucesso, IA
 
