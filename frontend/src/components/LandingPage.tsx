@@ -58,15 +58,15 @@ export function LandingPage({
   const useCases = [
     {
       icon: Eye,
-      title: "Análise de sentimento em Vídeos",
+      title: "Análise de Sentimento em Vídeos",
       description:
         "Analise comentários de vídeos publicados para entender a recepção do público como positiva, negativa ou neutra",
     },
     {
       icon: Heart,
-      title: "Moderação Inteligente",
+      title: "Mapeamento de Emoções",
       description:
-        "Identifique comentários negativos automaticamente para moderação proativa",
+        "Identifique emoções predominantes como alegria, raiva ou tristeza nos comentários",
     },
     {
       icon: FileText,
@@ -112,7 +112,7 @@ export function LandingPage({
               onClick={() => setCurrentPage("dashboard")}
               aria-label="Começar análise gratuita de comentários do YouTube"
             >
-              Começar Análise Gratuita
+              Iniciar
               <ArrowRight
                 className="ml-2 h-5 w-5"
                 aria-hidden="true"
@@ -137,8 +137,7 @@ export function LandingPage({
               Feito Especialmente para Criadores do YouTube
             </h2>
             <p className="text-xl text-gray-600">
-              Recursos desenvolvidos para entender sua audiência
-              em tempo real
+              Recursos desenvolvidos para entender sua audiência e extrair insights valiosos
             </p>
           </div>
 
@@ -249,7 +248,7 @@ export function LandingPage({
             onClick={() => setCurrentPage("dashboard")}
             aria-label="Experimentar análise de comentários do YouTube"
           >
-            Experimentar Agora - É Grátis
+            Experimentar agora!
             <Youtube
               className="ml-2 h-5 w-5"
               aria-hidden="true"
