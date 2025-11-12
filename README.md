@@ -18,21 +18,33 @@ cd PulsoEmocional
 
 2) Crie o Ambiente Virtual:
 
-python3.13 -m venv venv
+python3.10 -m venv venv
 
 3) Ative o ambiente virtual:
-
+- Linux/macOs:
 source venv/bin/activate
+- Windows(prompt de comando):
+venv\Scripts\activate
+- Windows(PowerShell):
+venv\Scripts\Activate.ps1
 
 4) Instale as Dependências:
 
 pip install -r requirements.txt
 
-## Como Rodar o Projeto - back e front
-Com a venv ativa
-Em um terminal, rode uvicorn main:app --reload na raiz do projeto
+- Para que o acesso à IA e os dados do Youtube funcionem, é necessário criar um arquivo .env com as chaves das respectivas APIs.
+Corpo do script .env:
+GEMINI_API_KEY=""
+YOUTUBE_API_KEY=""
 
-Em outro terminal, va ate a pasta frontend e rode npm run dev 
+## Como Rodar o Projeto - back e front
+- Com a venv ativa, em um terminal, rode na raiz do projeto:
+uvicorn main:app --reload
+
+- Em outro terminal:
+cd frontend
+npm install
+npm run dev
 
 ## Testes
 
