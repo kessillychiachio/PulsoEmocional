@@ -1,4 +1,4 @@
-# Pulso Emocional: um MicroSaaS para Análise Automática de Sentimentos baseada em Inteligência Artificial
+# Pulso Emocional: um WebApp para Análise Automática de Sentimentos baseada em Inteligência Artificial
 
 O Pulso Emocional é uma aplicação web que oferece uma funcionalidade específica e focada: a análise de sentimentos de comentários do YouTube através da IA.
 
