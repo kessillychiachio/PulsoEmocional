@@ -28,7 +28,13 @@ source venv/bin/activate
 
 pip install -r requirements.txt
 
-## Como Rodar o Projeto - para testes
+## Como Rodar o Projeto - back e front
+Com a venv ativa
+Em um terminal, rode uvicorn main:app --reload na raiz do projeto
+
+Em outro terminal, va ate a pasta frontend e rode npm run dev 
+
+## Testes
 
 cd backend
 cd testes
@@ -44,9 +50,3 @@ python classificador_youtube.py --video-id <videoid> // passa o video id no shel
 python validadores_humanos.py
 
 python coeficiente_kappa.py
-
-## Como Rodar o Projeto - back e front
-Com a venv ativa
-Em um terminal, rode uvicorn main:app --reload na raiz do projeto
-
-Em outro terminal, va ate a pasta frontend e rode npm run dev 
