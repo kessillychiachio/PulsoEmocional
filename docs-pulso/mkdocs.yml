@@ -1,0 +1,27 @@
+site_name: Pulso Emocional - Documentação
+# site_url: (a definir)
+
+theme:
+    name: material
+    language: pt
+    palette:
+        scheme: primary
+        primary: deep purple
+    features:
+        - navigation.tabs
+        - search.suggest
+        - search.highlight
+
+nav:
+    - Início: index.md
+    - 1. Visão Geral:
+        - Introdução: overview/introducao.md
+        - Arquitetura: overview/arquitetura.md
+    - 2. Configuração:
+        - Pré-requisitos: config/prerequisitos.md
+        - Instalação: config/instalacao.md
+        - Chaves de API (.env): config/api_keys.md
+    - 3. Execução: execution/execucao.md
+    - 4. Uso da Aplicação: usage/guia_uso.md
+    - 5. Testes: tests/guia_testes.md
+    - 6. Contribuição: CONTRIBUTING.md
