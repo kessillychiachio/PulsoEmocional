@@ -25,16 +25,15 @@ def preparar_planilhas_para_avaliacao():
     df_para_avaliadores.reset_index(drop=True, inplace=True)
 
     df_avaliador1 = df_para_avaliadores.copy()
-    df_avaliador1['Avaliação Humana (avaliador1)'] = ''
-    
+    df_avaliador1['Avaliação Humana (avaliador1)'] = ''  
     try:
         df_avaliador1.to_excel('avaliacoes_1.xlsx', index=False, engine='openpyxl')
         print("Planilha 'avaliacoes_1.xlsx' criada com sucesso!")
     except Exception as e:
         print(f"Erro ao salvar 'avaliacoes_1.xlsx': {e}")
+        
     df_avaliador2 = df_para_avaliadores.copy()
     df_avaliador2['Avaliação Humana (avaliador2)'] = ''
-    
     try:
         df_avaliador2.to_excel('avaliacoes_2.xlsx', index=False, engine='openpyxl')
         print("Planilha 'avaliacoes_2.xlsx' criada com sucesso!")
